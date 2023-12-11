@@ -97,7 +97,6 @@ function calculateArea(shape: Shape) {
 #### 타입과 값을 둘 다 사용하기 위해서는 타입을 클래스로 만드면 된다.
 
 이렇게 하게되면 [처음](#아래와-같은-코드가-있다고-가정)과 같이 사용 가능, **class는 자바스크립트의 구현되어 있는 실제 값이기도 하면서, 타입스크립트의 interface처럼 타입으로도 존재 가능**
-즉, shape은 Square나 Rectangle의 인스턴스여야 한다.
 
 ```ts
 class Square {
@@ -119,6 +118,42 @@ function calculateArea(shape: Shape) {
     return shape.width * shape.width;  // OK
   }
 ```
+
+즉, shape은 아래와 같이 Square나 Rectangle의 인스턴스여야 한다.
+
+```ts
+calculateArea(new Square(19));
+```
+
+### 3) 타입 연산은 런타임에 영향을 주지 않는다.
+
+#### 아래의 코드는 코드에 아무런 정제 과정이 없다.
+
+```ts
+function asNumber(val: number | string): number {
+  return val as number;
+}
+```
+
+위의 코드를 tsc하면? val 넘긴걸 val return. `as number`는 타입 연산이고 런타임 동작에는 아무런 영향을 미치지 않기 때문.
+
+```js
+function asNumber(val) {
+  return val;
+}
+```
+
+#### 값을 정제하기 위해서는 런타임의 타입을 체크해야 한다.
+
+자바스크립트 연산을 통해 변환을 수행해야 한다.
+
+```ts
+function asNumber(val: number | string): number {
+  return typeof val === "string" ? Number(val) : val;
+}
+```
+
+17분~
 
 ###### <참고> Transpile: 번역(translate) + 컴파일(compile)
 
