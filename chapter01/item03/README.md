@@ -238,7 +238,6 @@ function getFruit(fruitProperty: any): string[] {
 ### 6) 타입스크립트 타입은 런타임 성능에 영향을 주지 않는다.
 
 - `런타임` 오버헤드가 없는 대신, `빌드타임` 오버헤드가 있다. 오버헤드가 너무 크다 싶으면, 빌드도구에서 `트랜스파일만(transpile only)`을 설정하여 타입 체크를 건너뛸 수 있다.
--
 
 ###### <참고> Transpile: 번역(translate) + 컴파일(compile)
 
