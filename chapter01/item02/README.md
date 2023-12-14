@@ -12,7 +12,7 @@ ex) `tsc --noImplicitAny program.ts` | `'a'는 암시적으로 'any' 형식이 �
 ## 여기서 잠깐, strictNullChecks는 왜 설정할까요?
 ### `undefined is not Object.` 또는 `cannot read properties of undefined`
 null과 undefined를 체크하지 않으면 날 수 있는 오류입니다.
-```
+```ts
 function Component() {
   const ref = useRef();
 
