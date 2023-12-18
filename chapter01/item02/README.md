@@ -43,6 +43,3 @@ function Component() {
 ```
 
 <br/>
-
-## 질문
-차후 작성하겠습니다.
