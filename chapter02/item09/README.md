@@ -59,6 +59,26 @@ const people2 = ["alice", "bob", "jan"].map((name): Person => ({ name })); // Ty
    ```
 
    - 접미사로 쓰이는 `!`는 단언문이므로 컴파일 과정 중에 제거된다.
+   - **`하지만!`** null이 서브타입으로 존재하지 않으면 사용할 수 없다.
+
+   ```ts
+   interface Person {
+     name: string;
+   }
+   const body = document.body;
+   const el = body as Person; // Error 발생 - Person과 HTMLElment는 서로의 서브타입이 아니기 때문에 변환 불가
+   ```
+
+   - 이런 경우는 어떻게 해결을 할까??
+     #### unkown 사용
+     - 모든 타입은 unknown의 서브타입이기 때문에 unknown이 포함된 단언문은 항상 동작
+     - 하지만 unknown을 사용하는 것은 피하자!(위험한 동작이다)
+     ```ts
+     interface Person {
+       name: string;
+     }
+     const el = document.body as unknown as Person; // 정상
+     ```
 
 ## Qustions
 
