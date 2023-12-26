@@ -83,3 +83,79 @@ keyof와 대수 타입을 고려했을 때 아래 공식을 명심하자.
 keyof (A & B) = (keyof A) | (keyof B) // 모든 프로퍼티 다 있음
 keyof (A | B) = (keyof A) & (keyof B) // 공통적인 프로퍼티만 남음
 ```
+---
+## 질문
+> 타입들을 집합으로 비유했을 때, 아무 값도 포함하지 않는 never타입은 공집합이라고 할 수 있다고 책에 적혀있습니다.
+혹시 never 타입이 필요한 이유와 쓰이는 상황은 어떤 것들이 있을지 설명 가능하실까요?
+
+## 답변
+@han-kimm의 답변 <br/>
+### Never의 쓰임 1. 함수 호출을 막기
+never타입에 값이 할당이 안되는 걸 이용하면 특정 메소드를 오버라이딩, 즉 덮어쓰기를 해서 함수 파라미터의 타입을 never로 바꾸어 readonly 객체로 만들 수 있습니다.
+
+### Never의 쓰임 2. A | B 의 유니온 타입에서 A타입 또는 B타입으로 가드하기
+never은 공집합이므로 유니온 타입에서 항상 병합 된다는 걸 이용합니다. never | string 은 string이죠.
+이것은 Exclude의 정의에서 응용된 것과 같습니다. type Exclude<T, U> = T extends U ? never : T;에서, T가 U의 부분집합에 해당하면 never로 타입변환을 하여 공집합, 즉 소거해버리는 것이죠.
+
+```ts
+type VariantA = {
+    a: string
+    b?: never
+}
+
+type VariantB = {
+    b: number
+    a?: never
+}
+
+declare function fn(arg: VariantA | VariantB): void
+
+
+const input = {a: 'foo', b: 123 }
+fn(input) // 타입스크립트 에러, b는 undefined | never 에서 undefined 입니다.
+```
+
+---
+@Bematthewsong의 답변 <br/>
+never 타입은 불가능을 의미하는 타입입니다. 
+하늘님께서 좋은 사용예시를 알려주셔서 거기에 제가 알고 있는 예시를 덧붙여서 설명드리자면 아래 내용과 같습니다.
+### 1. 무한루프
+무한 루프는 아무런 값도 반환하지 않기 때문에 반환값 타입에 never를 명시합니다. 
+```ts
+function func(): never {
+  while (true) {}
+}
+```
+### 2. 오류 발생
+의도적으로 오류를 발생시키는 함수도 아무런 값을 반환하지 않아 반환값 타입에 never를 명시합니다.
+```ts
+function func(): never {
+  throw new Error();
+}
+```
+### 3. any를 담을 수 없게 하기  (값을 포함할 수 없는 빈 타입 - never)
+변수의 타입을 never로 정의하면, any를 포함해 그 어떠한 타입의 값도 이 변수에 담을 수 없게 됩니다. 
+
+---
+참고링크
+- https://ui.toast.com/posts/ko_20220323
+- https://ts.winterlood.com/2fc094af-7fe4-46d4-8c24-bb0596172b2e
+
+---
+## 질문
+```ts
+/**
+ * Exclude from T those types that are assignable to U
+ */
+type Exclude<T, U> = T extends U ? never : T;
+```
+Exclude에 대한 정의입니다.
+
+```ts
+type T = Exclude<string|Date, string|number>;  // Type is Date
+```
+>해당 예제에서 string|Date과 string|number는 p.44 벤 다이어그램에 나와있듯이 서로 상속되는 개념이 아니기 때문에 정의에 의하면 T가 그대로 나와서 타입이 string|Date가 되어야 할 것 같아서 여쭤봅니다. 정의를 그대로 따라가면 이해하기가 참 모호한 것 같지만, 어쨌든 Exclude라는 용어에 의해서는 왜 결과가 Date로 나왔는지는 어렴풋이 이해가 됩니다. 혹시 해당 정의에 따라 설명이 가능하신 분 계실까요? T extends U 가 성립이 안되는 것 같은데 말입니다...
+
+## 답변
+@han-kimm의 답변 <br/>
+Exclude에 대해서 정의에 따라 설명을 하자면 `type Exclude<T, U> = T extends U ? never : T;`와 `type S = Exclude<string|Date, string|number>;`에서 제네릭 T에 해당하는 `string | Date `는 string 또는 Date입니다. T가 string일 경우에는 제네릭 U의 `string | number` 집합의 부분집합이 되므로 never, T가 Date인 경우에는 부분집합이 되지 않으므로 Date가 됩니다. 따라서 |는 "합친다"는 개념보다는 "또는"으로 보면 이해가 더 빠를 것 같습니다.
