@@ -50,3 +50,19 @@ people[0].name = 'Daniel Lim';
 자바스크립트 및 타입스크립트에서는 명시적으로 언급하지 않는 한, 함수가 매개변수를 변경하지 않는다고 가정한다. 그러나 이러한 암묵적인 방법은 원하지 않는 함수의 동작을 불러 일으킬 수 있다. 따라서 함수가 매개변수를 변경하지 않는다면 readonly로 선언해야 한다.
 
 매개변수를 readonly로 선언하면 타입스크립트가 함수 내에서 매개변수가 변경되는지 체크하고, 함수를 호출하는 쪽에서는 매개변수가 변경되지 않는다는 보장을 받게 된다.
+
+```ts
+function arraySum(arr: number[]) {
+  let sum = 0,
+    num;
+  while ((num = arr.pop()) !== undefined) {
+    sum += num;
+  }
+  return sum;
+}
+
+const num = [1, 2, 3];
+
+console.log(arraySum(num));
+console.log(num);
+```
