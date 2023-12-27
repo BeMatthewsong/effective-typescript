@@ -51,6 +51,8 @@ people[0].name = 'Daniel Lim';
 
 매개변수를 readonly로 선언하면 타입스크립트가 함수 내에서 매개변수가 변경되는지 체크하고, 함수를 호출하는 쪽에서는 매개변수가 변경되지 않는다는 보장을 받게 된다.
 
+아래 예시에서는 숫자 배열의 합을 반환하는 함수를 선언하고 있다. 이때 매개변수로 넣어주는 배열은 함수 내부에서 변경되고 있는데, 이는 개발자가 의도한 동작이 아니다. 따라서 이러한 경우를 방지하기 위해 `arr`의 타입을 `readonly number[]`로 바꾸어 주면 의도치 않은 변경을 찾아 막을 수 있을 것이다.
+
 ```ts
 function arraySum(arr: number[]) {
   let sum = 0,
@@ -63,6 +65,6 @@ function arraySum(arr: number[]) {
 
 const num = [1, 2, 3];
 
-console.log(arraySum(num));
-console.log(num);
+console.log(arraySum(num)); // 6
+console.log(num); // []
 ```
