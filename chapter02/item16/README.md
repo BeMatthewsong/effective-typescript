@@ -1,4 +1,4 @@
-# 아이템 16. number 인덱스 시그니처보다는 Array, 튜플, ArrayLink를 사용하기
+# 아이템 16. number 인덱스 시그니처보다는 Array, 튜플, ArrayLike를 사용하기
 
 ## 요약
 
@@ -33,23 +33,28 @@
 ```tsx
 function get<T>(array: T[], k: string): T {
   return array[k]; // 오류 발생 - Element implicitly has an 'any' type because index expression is not of type 'number'.
+  // TS는 배열에 접근 시 인덱스가 number 타입으로 예상한다.
 }
 
 const xs = [1, 2, 3];
 const xTest: string = "1";
 const x0 = xs[0];
-const x1 = xs["1"]; // 정상 작동.. 왜???
+const x1 = xs["1"]; // 정상 작동.. Why??? (4.4 이전 version에서는 오류가 남)
 const x2 = xs[xTest]; // Element implicitly has an 'any' type because index expression is not of type 'number'.
 ```
+
+#### 정상 작동이 되는 이유
+
+- 4.4 버전부터 Index에 Symbol과 Template string pattern 사용이 가능해졌다
+
+  [문서](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-4.html#symbol-and-template-string-pattern-index-signatures)
 
 ### number 인덱스 시그니처를 말고 대체재는?
 
 - Array, ArrayLike 사용
+- 인덱스 시그니처를 만들 때, 키 타입이 number 라면 거의 대부분 경우 이미 정의된 Array 나 튜플 or ArrayLike 타입을 통해 사용할 수 있습니다.
 
-```tsx
-const tupleLink: ArrayLike<string> = {
-  "0": "A",
-  "1": "B",
-  length: 2,
-}; // 정상
-```
+### 결론
+
+- number 인덱스 시그니처를 위해 새롭게 타입을 만들 일이 거의 없다
+- Array, ArrayLike, 튜플 사용하자
