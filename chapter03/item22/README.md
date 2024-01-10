@@ -1,123 +1,137 @@
-# [아이템 22] 타입 좁히기
+ # [아이템 22] 타입 좁히기
 
-> - 편집기에서 타입스크립트가 타입을 어떻게 좁히는기에 대해 조사하여 타입 추론에 대한 개념을 잡을 수 있다.
-> - 태그된 유니온과 사용자 정의 타입 가드를 사용하여 타입을 좁힐 수 있다.
+- 타입스크립트의 타입 추론은 최대한 넓은 범위의 추론을 지향하고 있으며, 이를 타입 넓히기라고 한다.
+- 타입 넓히기로 인해서 원치 않는 범위까지 타입이 확장되므로, 이를 줄이는 과정을 타입 좁히기라고 한다.
+- 타입 좁히기는 조건문과 함수를 이용할 수 있다.
 
-## 타입을 좁히는 여러가지 방법
+ ## [조건문 타입 가드] null, undefined 제외하기
+### 타입 좁히기는 성공했으나... 혹시...타입이 babo?
+ ```ts
+function Component() {
+const inputRef = useRef<HTMLInputElement>(null);
 
-타입스크립트는 일반적으로 조건문 등에서 타입 좁히기를 매우 잘해준다. 가장 대표적인 타입 좁히기는 `null` 체크이다.
+const what = inputRef.current
+// HTMLInputElement | null
 
-```ts
-const el = document.getElementById('foo'); // 타입: HTMLElement | null
-if (el) {
-  el; // 타입: HTMLElement
-} else {
-  el; // 타입: null
+if (!what) return;
+
+what
+// HTMLInputElemnt
+
+return <input ref={inputRef} />
 }
 ```
 
-이 외에도 여러 방식들로 타입을 좁힐 수 있다.
 
-### instanceof, Array.isArray
-
-`instanceof` 또는 `Array.isArray`를 이용해서 타입을 좁힐 수 있다.
-
+## [조건문 타입 가드] typeof 이용하기
+### api 경로를 만드는 함수에서 타입가드를 해보자.
 ```ts
-function instanceofFn(text: string | RegExp) {
-  if (text instanceof RegExp) {
-    text; // 타입: RegExp
-    return;
+const CONSTANT = {
+  cards: "/api/cards",
+  card: (id: number) => `/api/card?cardId=${id}`
+} as const
+
+const pathFinder = (key: keyof typeof CONSTANT, id?: number) => {
+    // key: "cards" | "card";
+
+    const result = CONSTANT[key]
+
+    if (typeof result === "string") {
+      // key: "cards" 
+      return result;
+      // result: "/api/cards"
+    }
+
+    if (typeof result === "function" && id) {
+      // key: "card"
+      return result(id);
+      // result: (id: number) => string
+    }
+
+    throw new Error("id를 입력해주세요.") 
+  };
+```
+
+
+## [조건문 타입 가드] instanceof 이용하기
+### useAsync 훅의 try catch... 문에서 사용하기
+```ts
+  const catchError =
+    async <T extends (...arg:any) => any>(asyncFunc: T, ...arg: Parameters<T>) => {
+      try {
+        return await asyncFunc(arg);
+      } catch (e) {
+      // e: unknown
+        if (e instanceof Error) {
+          console.error(e);
+        }
+      }
+    }
+```
+
+
+## [조건문 타입 가드] 객체의 속성 체크
+### in 연산자 이용하기
+```ts
+interface person {
+  name: "하늘"
+}
+
+interface money {
+  amount: 500
+}
+
+function isPerson(something: person | money) {
+  if ("name" in something) {
+    something
+    // something: person
   }
-  text; // 타입: string
-  return;
-}
-
-function isArrayFn(text: string | string[]) {
-  const newText = Array.isArray(text) ? text : [text];
-  newText; // 타입: string[]
 }
 ```
 
-### 태그된 유니온
 
-명시적 태그를 붙이는 태그된 유니온 기법을 통해 타입을 좁힐 수도 있다.
-
+### 타입 좁히기를 위한 속성인 태그 이용하기
 ```ts
-interface UploadEvent {
-  type: 'upload';
-  filename: string;
-  contents: string;
+interface UserData {
+  type: "user";
+  users: User[];
+  ...
+  ...
+  ...
 }
 
-interface DownloadEvent {
-  type: 'download';
-  filename: string;
+interface CardData {
+  type: "card";
+  cards: Card[];
+  ...
+  ...
+  ...
 }
 
-function handleEvent(e: AppEvent) {
-  switch (e.type) {
-    case 'upload':
-      e; // 타입: UploadEvent
-      break;
-    case 'download':
-      e; // 타입: DownloadEvent
-      break;
+function filter(data: UserData | CardData) {
+  if (data.type === "user") {
+    data
+    // data: UserData
   }
 }
 ```
 
-### 사용자 정의 타입 가드 (type predicate)
-
-`is` 키워드를 활용하여 타입 가드를 만들어 타입 체커에게 매개변수의 타입을 좁힐 수 있다고 알려줄 수도 있다.
-
-아래 예시에서 `is` 키워드는 `isInputElement()` 함수를 거쳐서 `return` 값이 `true` 라면 함수가 호출된 범위 내에서는 `el`을 `HTMLInputElement` 타입으로 보라는 뜻을 가진다.
-
+## [함수 타입 가드] is 연산자를 이용하기
+### is는 리턴값이 true이고, 이 리턴값을 조건문에서 사용할 때만 타입 가드로 작동한다.
 ```ts
-function isInputElement(el: HTMLElement): el is HTMLInputElement {
-  return 'value' in el;
+function isX(str:string): str is "X" {
+  return str === "X"
 }
 
-function getElementContent(el: HTMLElement) {
-  if (isInputElement(el)) {
-    el; // 타입: HTMLInputElement
-    return el.value;
+const test1 = "X";
+// test1: "X"
+const result1 = isX(test1)
+// result1: boolean
+
+function xyz(str: "X" | "Y" | "Z") {
+  if (isX(str)) {
+    str
+    // str: "X"
   }
-  el; // 타입: HTMLElement
-  return el.textContent;
-}
-```
-
-아래 예시에서는 `filter` 함수를 사용해도 `undefined` 타입이 걸러지지 않는다. 이때 타입 가드를 활용하여 타입을 좁힐 수 있다.
-
-```ts
-const asConst = ['김하늘', '김종민', '손상희', '송규경', '송민혁', '임건우'];
-
-const members = ['김하늘', '김종민'].map((member) =>
-  asConst.find((n) => n === member)
-); // 타입: (string | undefined)[]
-
-const filterMembers = members.filter((who) => who !== undefined); // 타입: (string | undefined)[]
-
-function isDefined<T>(x: T | undefined): x is T {
-  return x !== undefined;
-}
-
-const typeGuardMembers = members.filter(isDefined); // 타입: string[]
-```
-
-## 잘못된 타입 좁히기
-
-타입 좁히기를 할 때는 타입이 정해지는 명확한 기준을 알고 있어야 합니다.
-
-다음은 잘못된 타입 좁히기의 예시들입니다.
-
-```ts
-const el = document.getElementById('foo');
-if (typeof el === 'object') {
-  el; // null도 object 이기에 타입이 HTMLElement | null 이 된다.
-}
-
-function check(x?: number | string | null) {
-  if (!x); // '' 과 0 이 false 이기에 타입이 string | number | null | undefined 가 된다
 }
 ```
