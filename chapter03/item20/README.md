@@ -4,7 +4,9 @@
 
 - 타입이 다른 값을 다룰 때에는 변수를 재사용하지 않도록 하자!
 
-### 예시
+---
+
+### 문제 상황
 
 ```tsx
 let id = "12-34-56";
@@ -26,12 +28,24 @@ fetchProductBySerialNumber(id);
   - But, id를 사용할 때마다 값이 어떤 타입인지 확인해야 함
   - 따라서, 분리하는 것이 BEST
 
-### 변수를 분리 하는 이유
+- 해결방법
 
-- 변수명을 더 구체적으로 지을 수 있다.(명시적인 표현 가능)
-- 타입 추론을 향상시키고, 타입 구문이 불필요해진다.
-- 타입이 간결해진다.(ex. `string | number` -> `string` or `number`)
-- let 대신 const로 변수 선언 가능
+  - 별도의 변수 사용
+
+    ```tsx
+    const id = "12-34-56";
+    fetchProduct(id);
+
+    const serial = 123456;
+    fetchProductBySerialNumber(serial);
+    ```
+
+  ### 변수를 분리 하는 이유
+
+  - 변수명을 더 구체적으로 지을 수 있다.(명시적인 표현 가능)
+  - 타입 추론을 향상시키고, 타입 구문이 불필요해진다.
+  - 타입이 간결해진다.(ex. `string | number` -> `string` or `number`)
+  - let 대신 const로 변수 선언 가능
 
 ## 잠깐 JavaScript
 
