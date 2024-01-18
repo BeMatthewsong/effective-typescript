@@ -78,7 +78,7 @@ function callRandom(fn: CallBack ) {
   fn(Math.random(), Math.random())
 }
 
-callRamdom((a:number, b:number) => console.log(a*b))
+callRandom((a:number, b:number) => console.log(a*b))
 //OK
 
 const newFn: CallBack = (a, b) => console.log(a+b);
