@@ -130,3 +130,131 @@ async function getJSON(url: string) {
   return jsonPromise;  
 }
 ```
+
+### async/await를 써야하는 이유
+출처: [자바스크립트의 Async/Await가 Promise를 사라지게 만들 수 있는 6가지 이유](https://medium.com/@constell99/%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8%EC%9D%98-async-await-%EA%B0%80-promises%EB%A5%BC-%EC%82%AC%EB%9D%BC%EC%A7%80%EA%B2%8C-%EB%A7%8C%EB%93%A4-%EC%88%98-%EC%9E%88%EB%8A%94-6%EA%B0%80%EC%A7%80-%EC%9D%B4%EC%9C%A0-c5fe0add656c)
+
+#### 1. 간결함과 깔끔함
+#### 2. 에러 핸들링
+```js
+const makeRequest = () => {
+  try {
+    getJSON()
+      .then(result => {
+        // this parse may fail
+        const data = JSON.parse(result)
+        console.log(data)
+      })
+      // uncomment this block to handle asynchronous errors
+      // .catch((err) => {
+      //   console.log(err)
+      // })
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+// async/await
+const makeRequest = async () => {
+  try {
+    // this parse may fail
+    const data = JSON.parse(await getJSON())
+    console.log(data)
+  } catch (err) {
+    console.log(err)
+  }
+}
+```
+#### 3. 분기
+```js
+const makeRequest = () => {
+  return getJSON()
+    .then(data => {
+      if (data.needsAnotherRequest) {
+        return makeAnotherRequest(data)
+          .then(moreData => {
+            console.log(moreData)
+            return moreData
+          })
+      } else {
+        console.log(data)
+        return data
+      }
+    })
+}
+// async/await
+const makeRequest = async () => {
+  const data = await getJSON()
+  if (data.needsAnotherRequest) {
+    const moreData = await makeAnotherRequest(data)
+    console.log(moreData)
+    return moreData
+  } else {
+    console.log(data)
+    return data    
+  }
+}
+```
+#### 4. 중간값
+```js
+const makeRequest = () => {
+  return promise1()
+    .then(value1 => {
+      // do something
+      return promise2(value1)
+        .then(value2 => {
+          // do something          
+          return promise3(value1, value2)
+        })
+    })
+}
+// async/await
+const makeRequest = async () => {
+  const value1 = await promise1()
+  const value2 = await promise2(value1)
+  return promise3(value1, value2)
+}
+```
+#### 5. 에러 스택
+```js
+const makeRequest = () => {
+  return callAPromise()
+    .then(() => callAPromise())
+    .then(() => callAPromise())
+    .then(() => callAPromise())
+    .then(() => callAPromise())
+    .then(() => {
+      throw new Error("oops");
+    })
+}
+
+makeRequest()
+  .catch(err => {
+    console.log(err);
+    // output
+    // Error: oops at callAPromise.then.then.then.then.then (index.js:8:13)
+  })
+
+// async/await
+const makeRequest = async () => {
+  await callAPromise()
+  await callAPromise()
+  await callAPromise()
+  await callAPromise()
+  await callAPromise()
+  throw new Error("oops");
+}
+
+makeRequest()
+  .catch(err => {
+    console.log(err);
+    // output
+    // Error: oops at makeRequest (index.js:7:9)
+  })
+```
+
+#### 6. 디버깅
+
+
+### 자바스크립트의 비동기, Promise, async/await 이해하기(추가자료)
+- https://springfall.cc/article/2022-11/easy-promise-async-await
