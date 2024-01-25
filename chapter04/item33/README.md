@@ -70,6 +70,7 @@ type RecordingType = "live" | "studio";
 // keyof Album ("artist" | "title" | "releaseDate" | "recordingType")
 
 // key에 string 대신에 keyof T를 사용하자
+// keyof를 통해 객체 프로퍼티가 들어가는 매개변수의 타입을 더 정밀하게 알 수 있다
 function pluck<T, K extends keyof T>(record: T[], key: K): T[K][] {
   return record.map(r => r[key])
 }
