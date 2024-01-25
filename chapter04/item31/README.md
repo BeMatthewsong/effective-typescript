@@ -1,11 +1,11 @@
-## [아이템31] 타입 주변에 null 값 배치하기
+# [아이템31] 타입 주변에 null 값 배치하기
 
-### 요약
+## 요약
 1. 여러 개의 변수가 서로 연관되어 있다면, 암시적 추론보다는 각각의 타입을 명시하는 것이 좋다.
 2. 여러 변수의 타입 명시에는 객체([], {})를 사용하는 것이 좋다.
 3. falsy값에 주의하면서 값을 체크하자.
 
-### 여러 변수의 타입 명시 - React Hook
+## 여러 변수의 타입 명시 - React Hook
 리액트 훅을 사용할 때 반환하는 값이 왜 배열인지 생각해 보았는가?
 안전하게 타입까지 반환하기 위함이다.
 ```ts
@@ -47,7 +47,7 @@ const useInfScroll = () => {
 };
 ```
 
-### 초기화 과정이 있다면 null 명시가 필요함!
+## 초기화 과정이 있다면 null 명시가 필요함!
 리액트에서는 useRef로 DOM 접근을 할 때,
 처음에는 ref.current === undefined로 초기화되지만,
 Mount 과정에서 ref 값이 Element Instance로 설정됨.
@@ -56,8 +56,16 @@ Mount 이전 ref를 사용할 경우의 오류를 막기 위해서 null을 명�
 const inputRef = useRef<HTMLElement>(null)
 ```
 
+## 데이터 fetching 완료 전, 해당 변수를 사용하는 경우
+```ts
+const data = useData();
+// 통신 완료 전 렌더링 시작되면 오류 가능성이 높아짐
+```
+SSR 또는 React-Query
+혹은 React 18의 <Suspense/> 기능을 이용하기
+
 혹시 시간이 null null 하신가요? 질문 드립니다.
-### Q. 이것은 왜 일까요...
+## Q. 이것은 왜 일까요...
 ```ts
 const [a, setA] = useState({a: null, b: null})
 
