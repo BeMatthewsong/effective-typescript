@@ -25,7 +25,6 @@ const hasTwelveLetterKey = (o: object) => {
   for (const key in o) {
     if (key.length === 12) {
       console.log(key, o[key]); // object 타입은 속성에 접근 불가
-
       return key;
     }
   }
