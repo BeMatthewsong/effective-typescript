@@ -87,3 +87,37 @@ function f(x: number | string) {
 
 오버로딩 타입은 독립적으로 처리되지만,
 조건부 타입은 타입 체커가 단일 표현식으로 받아들이기 때문에 유니온 문제를 해결할 수 있다.
+
+### 질문 
+```ts
+function double<T extends number | string>(x:T): T extends string ? string : number;
+function double(x: any) { return x + x };
+```
+
+코드를 보다가 만약 타입이 2개가 아니라 더 늘어나게 된다면 가독성이 떨어질 것 같다는 생각이 들었습니다.  
+만약 삼항연산자를 사용하지 않고 조건부 타입을 사용하는 방법이 있다면 예시를 보여주실 수 있을까요? 아니면 타입이 많다면 다른 함수로 만드는 방법이 좋을까요??
+
+#### 답변
+Typescript 2.8부터 타입을 선택하게 하는 조건부 타입이 도입되었으며, 삼항연산자를 사용한 타입 선언이 조건부타입이라고 부릅니다.
+```ts
+T extends U ? X : Y
+```
+검사된 타입이 벗겨진 (naked) 타입 매개변수인 조건부 타입을 분산 조건부 타입이라고 부릅니다.
+좀더 이해하기 쉽게 타입이 2개가 아닌 여러개 즉, 유니온으로 타입을 제네릭으로 할당한다면 분산 조건부 타입이 됩니다.
+```ts
+type T1 = (1 | 3 | 5 | 7) extends number ? 'yes' : 'no'; 
+// naked 타입이 아니라서 분산이 되지 않는다.
+type T2<T> = T extends number ? T[] : 'no'; 
+// 제네릭 T는 naked 타입이라 분산이 된다.
+type T3<T> = T[] extends number ? 'yes' : T[]; 
+// 제네릭이지만 T[] 와 같이 변형된 타입 파라미터는 naked 타입이 아니라서 분산이 일어나지 않는다.
+
+type T4 = T1; // "yes"
+type T5 = T2<(1 | 3 | 5 | 7)>; // 1[] | 3[] | 5[] | 7[]
+type T6 = T2<(1 | 3 | 5 | 7)>; // (1 | 3 | 5 | 7)[]
+```
+조건부 타입에서 (naked) type parameter 가 사용된 경우에만 분산 방식으로 동작합니다.
+
+여기서 naked type parameter를 정의하기를 다음과 같이 정의합니다.
+
+>(naked) type parameter는 제네릭 T 와 같이 의미가 없는 타입 파라미터를 말하는 것이며, 만일 직접 리터럴 타입을 명시하거나 혹은 제네릭 T[] 와 같이 변횐된 타입 파라미터이면, naked 가 아니게 된다.
