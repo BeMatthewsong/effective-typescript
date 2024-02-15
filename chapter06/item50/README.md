@@ -121,3 +121,7 @@ type T6 = T2<(1 | 3 | 5 | 7)>; // (1 | 3 | 5 | 7)[]
 여기서 naked type parameter를 정의하기를 다음과 같이 정의합니다.
 
 >(naked) type parameter는 제네릭 T 와 같이 의미가 없는 타입 파라미터를 말하는 것이며, 만일 직접 리터럴 타입을 명시하거나 혹은 제네릭 T[] 와 같이 변횐된 타입 파라미터이면, naked 가 아니게 된다.
+
+### 출처
+- [타입스크립트 조건부 타입 완벽 이해하기](https://inpa.tistory.com/entry/TS-%F0%9F%93%98-%ED%83%80%EC%9E%85%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8-%EC%A1%B0%EA%B1%B4%EB%B6%80-%ED%83%80%EC%9E%85-%EC%99%84%EB%B2%BD-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0)
+- [고급 타입](https://typescript-kr.github.io/pages/advanced-types.html)
