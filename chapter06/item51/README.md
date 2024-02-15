@@ -48,7 +48,7 @@ interface CSVBuffer {
   toString(encoding: string) : string;
 }
 
-function parseVSC(contents: string | CSVBuffer) {
+function parseCSV(contents: string | CSVBuffer) {
   ...
 }
 ```
