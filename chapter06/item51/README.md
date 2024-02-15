@@ -24,3 +24,31 @@
 프로젝트의 의존성이 다양해질 수록 미러링 기법을 적용하기 어려워진다.
 
 다른 라이브러리의 타입 선언 대부분을 추출해야한다면 차라리 `@types` 의존성을 추가하는 것이 낫다.
+
+## 미러링 예시
+
+CSV 파일을 파싱하는 라이브러리를 만든다고 했을 때, 해당 API는 CSV 파일의 내용을 매개변수로 받게 된다. 이때 NodeJS 사용자들을 위해 매개변수에 `Buffer`(NodeJS에서 바이너리 데이터 스트림을 다루는데 사용되는 클래스) 타입을 추가하면 다음과 같이 코드가 구성된다.
+
+```ts
+function parseCSV(contents: string | Buffer) {
+  ...
+}
+```
+
+이떄 Buffer의 타입 정보는 NodeJS 타입 선언을 설치해야 얻을 수 있다.
+
+```
+npm install -D @types/node
+```
+
+그러나 이와 같이 devDependencies로 포함하면 위에서 언급한 그룹들의 개발자들에게 문제가 생기므로 다음과 같이 미러링 타입을 사용하는 것이 좋다.
+
+```ts
+interface CSVBuffer {
+  toString(encoding: string) : string;
+}
+
+function parseVSC(contents: string | CSVBuffer) {
+  ...
+}
+```
