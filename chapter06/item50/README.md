@@ -74,7 +74,7 @@ function double(x: any) {
   
 const num = double(12);  // number
 const str = double('12');  // string
-  
+
 function f(x: number | string) {  
   return double(x);  
 }
@@ -114,7 +114,7 @@ type T3<T> = T[] extends number ? 'yes' : T[];
 
 type T4 = T1; // "yes"
 type T5 = T2<(1 | 3 | 5 | 7)>; // 1[] | 3[] | 5[] | 7[]
-type T6 = T2<(1 | 3 | 5 | 7)>; // (1 | 3 | 5 | 7)[]
+type T6 = T3<(1 | 3 | 5 | 7)>; // (1 | 3 | 5 | 7)[]
 ```
 조건부 타입에서 (naked) type parameter 가 사용된 경우에만 분산 방식으로 동작합니다.
 
