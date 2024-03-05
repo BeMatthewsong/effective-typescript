@@ -12,3 +12,36 @@
 - 타입스크립트를 도입할 때 가장 중요한 기능
   - ECMAScript 모듈
   - ES2015 클래스
+
+아이템 58에서 소개하는 기능들은 모두 모던 자바스크립트(ES2015, 일명 ES6 version) 부터 도입된 주요 기능입니다.
+
+## ECMAScript 모듈 사용하기
+
+코드를 개별 모듈로 분할하는 방법에는 여러 개의 `<script>` 태그를 사용하기, 직접 갖다 붙이기(manual concatenation), Makefile 기법, NodeJS 스타일의 require 구문, AMD 스타일의 define 콜백까지 매우 다양하지만, ES2015부터는 import, export를 사용하는 ECMAScript 모듈이 표준이 되었습니다. 만약 마이그레이션 대상인 자바스크립트 코드가 단일 파일이거나 비표준 모듈 시스템을 사용 중이라면 ES 모듈로 전환하는 것이 좋습니다.
+
+- CommonJS 모듈 시스템
+
+```js
+//CommonJS
+//a.js
+const b = require("./b");
+console.log(b.name);
+
+//b.js
+const name = "Module B";
+module.exports = { name };
+```
+
+- ES 모듈
+
+```js
+//ECMASCript module
+//a.ts
+import * as b from "./b";
+console.log(b.name);
+
+//b.ts
+export const name = "Module B";
+```
+
+## 프로토타입 대신 클래스 사용하기
